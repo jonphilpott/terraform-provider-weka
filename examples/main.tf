@@ -9,13 +9,6 @@ terraform {
 
 provider "weka" { }
 
-data "weka_test" "test" { }
-
-#
-#resource "weka_objectstore" "obs_test1" {
-#	name = "obs_test1"
-#}
-
 resource "weka_filesystem" "test1fs" {
 	name = "test21"
 	total_capacity_gb = 4
