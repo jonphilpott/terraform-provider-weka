@@ -116,7 +116,7 @@ func (w *WekaClient) makeRequest(r *http.Request) ([]byte, error) {
 		return nil, err
 	}
 
-	log.Println("[DEBUG] Weka Request: %s", string(requestDump))
+	log.Printf("[DEBUG] Weka Request: %s\n", string(requestDump))
 
 	res, err := w.client.Do(r)
 
@@ -132,7 +132,7 @@ func (w *WekaClient) makeRequest(r *http.Request) ([]byte, error) {
 		return nil, err
 	}
 
-	log.Println("[DEBUG] Weka Response: %s", body)
+	log.Printf("[DEBUG] Weka Response: %s\n", body)
 
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("Non-200 status from Weka API: %d", res.StatusCode)
@@ -146,7 +146,7 @@ func (w *WekaClient) makeRequest(r *http.Request) ([]byte, error) {
 
 	// response indicates an error
 	if wer.Data.Error != "" {
-		return nil, fmt.Errorf("Error from Weka API: %s", wer.Message, body)
+		return nil, fmt.Errorf("Error from Weka API: %s", wer.Message)
 	}
 
 	return body, err
