@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"net/http"
@@ -20,11 +21,11 @@ func resourceKMS() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"base_url": &schema.Schema{
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 			},
 			"master_key_name": &schema.Schema{
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 			},
 			"token": &schema.Schema{
 				Type:        schema.TypeString,
@@ -60,10 +61,9 @@ func resourceKMS() *schema.Resource {
 				DefaultFunc: schema.EnvDefaultFunc("WEKA_VAULT_CA_CERT", nil),
 				Sensitive:   true,
 			},
-			"kms_type": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Optional: true,
+			"use_vault": &schema.Schema{
+				Type:     schema.TypeBool,
+				Required: true,
 			},
 			"last_updated": &schema.Schema{
 				Type:     schema.TypeString,
@@ -84,45 +84,9 @@ type WekaKMS struct {
 	} `json:"data"`
 }
 
-func extractKMSJsonData(body []byte, d *schema.ResourceData) error {
-	var kms WekaKMS
-
-	if err := json.Unmarshal(body, &kms); err != nil {
-		return err
-	}
-
-	d.Set("master_key_name", kms.Data.Params.MasterKeyName)
-	d.Set("base_url", kms.Data.Params.BaseURL)
-	d.Set("kms_type", kms.Data.KmsType)
-
-	return nil
-}
-
+// Do Nothing. Not enough information is returned in the read to make any determination.
 func resourceKMSRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*WekaClient)
-	var diags diag.Diagnostics
-
-	url := c.makeRestEndpointURL("kms")
-	req, err := http.NewRequest("GET", url.String(), nil)
-
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	body, err := c.makeRequest(req)
-
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	if err := extractKMSJsonData(body, d); err != nil {
-		return diag.FromErr(err)
-	}
-
-	// no ID on this object, set one to keep tf happy.
-	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
-
-	return diags
+	return nil
 }
 
 func resourceKMSDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -154,16 +118,42 @@ func resourceKMSCreate(ctx context.Context, d *schema.ResourceData, m interface{
 	var diags diag.Diagnostics
 	c := m.(*WekaClient)
 
-	createBody, err := json.Marshal(map[string]string{
-		"base_url":        d.Get("base_url").(string),
-		"master_key_name": d.Get("master_key_name").(string),
-		"token":           d.Get("token").(string),
-		//"server_endpoint": d.Get("server_endpoint").(string),
-		//		"key_uid":         d.Get("key_uid").(string),
-		//		"client_cert_pem": d.Get("client_cert_pem").(string),
-		//		"client_key_pem":  d.Get("client_key_pem").(string),
-		//		"ca_cert_pem":     d.Get("ca_cert_pem").(string),
-	})
+	createParams := make(map[string]string)
+
+	vaultFields := []string{
+		"base_url", "master_key_name", "token",
+	}
+	kmipFields := []string{
+		"server_endpoint", "key_uid", "client_cert_pem", "client_key_pem", "ca_cert_pem",
+	}
+
+	if d.Get("use_vault").(bool) {
+		for _, v := range vaultFields {
+			if d.Get(v).(string) == "" {
+				diags = append(diags, diag.Diagnostic{
+					Severity: diag.Error,
+					Summary:  fmt.Sprintf("Missing configuration value for %s to configure KMS for Vault", v),
+				})
+				return diags
+			}
+
+			createParams[v] = d.Get(v).(string)
+		}
+	} else {
+		for _, v := range kmipFields {
+			if d.Get(v).(string) == "" {
+				diags = append(diags, diag.Diagnostic{
+					Severity: diag.Error,
+					Summary:  fmt.Sprintf("Missing configuration value for %s to configure KMIP", v),
+				})
+				return diags
+			}
+
+			createParams[v] = d.Get(v).(string)
+		}
+	}
+
+	createBody, err := json.Marshal(createParams)
 
 	if err != nil {
 		return diag.FromErr(err)
@@ -176,7 +166,7 @@ func resourceKMSCreate(ctx context.Context, d *schema.ResourceData, m interface{
 		return diag.FromErr(err)
 	}
 
-	resourceKMSRead(ctx, d, m)
+	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
 
 	return diags
 }
