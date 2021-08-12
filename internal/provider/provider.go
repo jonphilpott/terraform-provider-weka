@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -53,16 +54,16 @@ func New(version string) func() *schema.Provider {
 					DefaultFunc: schema.EnvDefaultFunc("WEKA_ORG", nil),
 				},
 				"endpoint": &schema.Schema{
-					Type:     schema.TypeString,
-					Required: true,
+					Type:        schema.TypeString,
+					Required:    true,
 					DefaultFunc: schema.EnvDefaultFunc("WEKA_ENDPOINT", nil),
 				},
 			},
 			ResourcesMap: map[string]*schema.Resource{
-				"weka_kms":         resourceKMS(),
-				"weka_filesystem":  resourceFilesystem(),
+				"weka_kms":        resourceKMS(),
+				"weka_filesystem": resourceFilesystem(),
 			},
-			DataSourcesMap: map[string]*schema.Resource{},
+			DataSourcesMap:       map[string]*schema.Resource{},
 			ConfigureContextFunc: providerConfigure,
 		}
 
@@ -115,6 +116,8 @@ func (w *WekaClient) makeRequest(r *http.Request) ([]byte, error) {
 		return nil, err
 	}
 
+	log.Println("[DEBUG] Weka Request: %s", string(requestDump))
+
 	res, err := w.client.Do(r)
 
 	if err != nil {
@@ -129,8 +132,10 @@ func (w *WekaClient) makeRequest(r *http.Request) ([]byte, error) {
 		return nil, err
 	}
 
+	log.Println("[DEBUG] Weka Response: %s", body)
+
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Non-200 status from Weka API: %d\nBody:\n%s\n\nRequest:%s", res.StatusCode, body, string(requestDump))
+		return nil, fmt.Errorf("Non-200 status from Weka API: %d", res.StatusCode)
 	}
 
 	// is it JSON? is it an error?
@@ -141,7 +146,7 @@ func (w *WekaClient) makeRequest(r *http.Request) ([]byte, error) {
 
 	// response indicates an error
 	if wer.Data.Error != "" {
-		return nil, fmt.Errorf("Error from Weka API: %s\nBody\n:%s", wer.Message, body)
+		return nil, fmt.Errorf("Error from Weka API: %s", wer.Message, body)
 	}
 
 	return body, err
