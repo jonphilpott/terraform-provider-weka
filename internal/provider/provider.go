@@ -60,8 +60,10 @@ func New(version string) func() *schema.Provider {
 				},
 			},
 			ResourcesMap: map[string]*schema.Resource{
-				"weka_kms":        resourceKMS(),
-				"weka_filesystem": resourceFilesystem(),
+				"weka_kms":              resourceKMS(),
+				"weka_filesystem":       resourceFilesystem(),
+				"weka_filesystem_group": resourceFilesystemGroup(),
+				"weka_user":             resourceUser(),
 			},
 			DataSourcesMap:       map[string]*schema.Resource{},
 			ConfigureContextFunc: providerConfigure,
@@ -84,6 +86,7 @@ type WekaClient struct {
 	authResponse WekaAuthResponse
 	endPoint     *url.URL
 	client       *http.Client
+	org          string
 }
 
 type WekaErrorResponse struct {
@@ -91,6 +94,10 @@ type WekaErrorResponse struct {
 	Data    struct {
 		Error string `json:"error"`
 	} `json:"data"`
+}
+
+func (w *WekaClient) getOrg() string {
+	return w.org
 }
 
 func (w *WekaClient) makeRestEndpointURL(p string) url.URL {
@@ -171,6 +178,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		}
 
 		c.endPoint = url
+		c.org = org
 
 		// attempt the auth
 		authBody, err := json.Marshal(map[string]string{
