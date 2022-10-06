@@ -1,7 +1,7 @@
 terraform {
 	required_providers {
 		weka = {
-		   version = "0.1"
+		   version = "0.2"
 		   source = "github.com/jonphilpott/weka"
 		}
         }
@@ -24,4 +24,5 @@ resource "weka_kms" "kms_test1" {
 	base_url = "https://localhost:1234/"
 	master_key_name = "foo"
 	token = "foobar"
+        use_vault = false
 }
