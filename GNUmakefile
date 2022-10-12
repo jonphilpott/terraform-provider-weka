@@ -3,8 +3,8 @@ HOSTNAME=github.com
 NAMESPACE=jonphilpott
 NAME=weka
 BINARY=terraform-provider-${NAME}
-VERSION=0.2
-OS_ARCH=darwin_amd64
+VERSION=0.3
+OS_ARCH=linux_amd64
 
 default: install
 

@@ -30,15 +30,23 @@ func resourceUser() *schema.Resource {
 			"role": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
+				ValidateFunc: func(val any, key string) (warns []string, errs []error) {
+					v := val.(string)
+
+					if !(v == "ClusterAdmin" || v == "OrgAdmin" || v == "ReadOnly" || v == "Regular" || v == "S3") {
+						errs = append(errs, fmt.Errorf("%q must be one of ClusterAdmin, OrgAdmin, ReadOnly, Regular or S3, got: %s", key, v))
+					}
+
+					return
+				},
 			},
 			"posix_uid": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:     schema.TypeInt,
+				Optional: true,
 			},
 			"posix_gid": &schema.Schema{
 				Type:      schema.TypeInt,
-				Required:  true,
-				Sensitive: false,
+				Optional:  true,
 			},
 			"last_updated": &schema.Schema{
 				Type:     schema.TypeInt,
@@ -56,6 +64,8 @@ type WekaUser struct {
 		Source   string `json:"source"`
 		Username string `json:"username"`
 		Role     string `json:"role"`
+		PosixUID int    `json:"posix_uid"`
+		PosixGID int    `json:"posix_gid"`
 	} `json:"data"`
 }
 
@@ -178,8 +188,14 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 	createParams["username"] = d.Get("username").(string)
 	createParams["password"] = d.Get("password").(string)
 	createParams["role"] = d.Get("role").(string)
-	createParams["posix_uid"] = d.Get("posix_uid").(int)
-	createParams["posix_gid"] = d.Get("posix_gid").(int)
+
+	if d.HasChange("posix_uid") {
+		createParams["posix_uid"] = d.Get("posix_uid").(int)
+	}
+
+	if d.HasChange("posix_uid") {
+		createParams["posix_gid"] = d.Get("posix_gid").(int)
+	}
 
 	createBody, err := json.Marshal(createParams)
 
@@ -190,7 +206,7 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 	url := c.makeRestEndpointURL("users")
 	req, err := http.NewRequest("POST", url.String(), bytes.NewBuffer(createBody))
 
-	if _, err := c.makeRequest(req); err != nil {
+	if err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -205,6 +221,9 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 	if err := json.Unmarshal(body, &wekauser); err != nil {
 		return diag.FromErr(err)
 	}
+
+	d.Set("posix_uid", wekauser.Data.PosixUID)
+	d.Set("posix_gid", wekauser.Data.PosixGID)
 
 	d.SetId(wekauser.Data.UID)
 

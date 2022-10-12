@@ -3,6 +3,7 @@ package provider
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -39,18 +40,18 @@ func New(version string) func() *schema.Provider {
 			Schema: map[string]*schema.Schema{
 				"username": &schema.Schema{
 					Type:        schema.TypeString,
-					Optional:    true,
+					Required:    true,
 					DefaultFunc: schema.EnvDefaultFunc("WEKA_USERNAME", nil),
 				},
 				"password": &schema.Schema{
 					Type:        schema.TypeString,
-					Optional:    true,
+					Required:    true,
 					Sensitive:   true,
 					DefaultFunc: schema.EnvDefaultFunc("WEKA_PASSWORD", nil),
 				},
 				"org": &schema.Schema{
 					Type:        schema.TypeString,
-					Optional:    true,
+					Required:    true,
 					DefaultFunc: schema.EnvDefaultFunc("WEKA_ORG", nil),
 				},
 				"endpoint": &schema.Schema{
@@ -92,7 +93,8 @@ type WekaClient struct {
 type WekaErrorResponse struct {
 	Message string `json:"message"`
 	Data    struct {
-		Error string `json:"error"`
+		Error     string `json:"error"`
+		Reason    string `json:"reason"`
 	} `json:"data"`
 }
 
@@ -141,19 +143,31 @@ func (w *WekaClient) makeRequest(r *http.Request) ([]byte, error) {
 
 	log.Printf("[DEBUG] Weka Response: %s\n", body)
 
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Non-200 status from Weka API: %d", res.StatusCode)
-	}
-
 	// is it JSON? is it an error?
+	// this seems a little backwards here, but weka can send an json error with an http error code, so try a json parse first so we can provide a help error message, then check http status code
 	var wer WekaErrorResponse
-	if err := json.Unmarshal([]byte(body), &wer); err != nil {
-		return nil, err
+	message := ""
+
+	if err := json.Unmarshal([]byte(body), &wer); err == nil {
+		log.Printf("[DEBUG] parsed a json WER, msg = %s", message)
+		message = wer.Message
+
+		// response indicates an error
+		if (wer.Data.Error != "" || wer.Data.Reason != "")  {
+			return nil, fmt.Errorf("Error from Weka API: %s", wer.Message)
+		}
+	} else {
+		log.Printf("[DEBUG] body did not parse.")
 	}
 
-	// response indicates an error
-	if wer.Data.Error != "" {
-		return nil, fmt.Errorf("Error from Weka API: %s", wer.Message)
+
+	// check status code
+	if res.StatusCode != http.StatusOK {
+		if message == "" {
+			return nil, fmt.Errorf("Non-200 status from Weka API: %d", res.StatusCode)
+		} else {
+			return nil, fmt.Errorf("Non-200 status from Weka API: %d, message: %s", res.StatusCode, message)
+		}
 	}
 
 	return body, err
@@ -194,6 +208,9 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		c.client = &http.Client{
 			Timeout: time.Second * 10,
 		}
+
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+
 
 		// form URL.
 		loginUrl := c.makeRestEndpointURL("login")
