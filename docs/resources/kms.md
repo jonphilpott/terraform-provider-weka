@@ -17,19 +17,22 @@ description: |-
 
 ### Required
 
-- **base_url** (String)
-- **master_key_name** (String)
+- `use_vault` (Boolean)
 
 ### Optional
 
-- **ca_cert_pem** (String, Sensitive)
-- **client_cert_pem** (String, Sensitive)
-- **client_key_pem** (String, Sensitive)
-- **id** (String) The ID of this resource.
-- **key_uid** (String, Sensitive)
-- **kms_type** (String)
-- **last_updated** (String)
-- **server_endpoint** (String)
-- **token** (String, Sensitive)
+- `base_url` (String)
+- `ca_cert_pem` (String, Sensitive)
+- `client_cert_pem` (String, Sensitive)
+- `client_key_pem` (String, Sensitive)
+- `key_uid` (String, Sensitive)
+- `last_updated` (String)
+- `master_key_name` (String)
+- `server_endpoint` (String)
+- `token` (String, Sensitive)
+
+### Read-Only
+
+- `id` (String) The ID of this resource.
 
 
