@@ -26,6 +26,7 @@ func resourceS3Policy() *schema.Resource {
 				Required: true,
 			},
 			"policy_file_content": &schema.Schema{
+				Type:             schema.TypeString,
 				Required:         true,
 				ValidateFunc:     validation.StringIsJSON,
 				DiffSuppressFunc: AWSPolicyDiff,
@@ -73,18 +74,20 @@ func resourceS3PolicyRead(ctx context.Context, d *schema.ResourceData, m interfa
 		return diag.FromErr(err)
 	}
 
-	responseDoc = make(map[string]interface{})
+	responseDoc := make(map[string]interface{})
 
 	if err := json.Unmarshal(body, &responseDoc); err != nil {
 		return diag.FromErr(err)
 	}
 
+	var policy map[string]interface{} = responseDoc["data"].(map[string]interface{})["policy"].(map[string]interface{})
+	
 	// remarshall the policy document. urgh.
-	policyDocument, _ := json.Marshal(responseDoc["data"]["policy"]["content"])
+	policyDocument, _ := json.Marshal(policy["content"])
 
-	d.Set("policy_name", responseDoc["data"]["policy"]["name"])
+	d.Set("policy_name", policy["name"])
 	d.Set("policy_file_content", string(policyDocument))
-	d.SetId(responseDoc["data"]["policy"]["name"])
+	d.SetId(policy["name"].(string))
 
 	return diags
 }
@@ -126,7 +129,7 @@ func resourceS3PolicyCreate(ctx context.Context, d *schema.ResourceData, m inter
 
 	// dance around json stuff
 	var policyDocument map[string]interface{}
-	if err := json.Unmarshal([]byte(d.Get("policy_file_content").(string)), &moarJsonShit); err != nil {
+	if err := json.Unmarshal([]byte(d.Get("policy_file_content").(string)), &policyDocument); err != nil {
 		return diag.FromErr(err)
 	}
 	createParams["policy_file_content"] = policyDocument
@@ -144,7 +147,7 @@ func resourceS3PolicyCreate(ctx context.Context, d *schema.ResourceData, m inter
 		return diag.FromErr(err)
 	}
 
-	body, err := c.makeRequest(req)
+	_, err = c.makeRequest(req)
 
 
 	// if the swagger docs are to be trusted, then there's no useful
