@@ -65,6 +65,7 @@ func New(version string) func() *schema.Provider {
 				"weka_filesystem":       resourceFilesystem(),
 				"weka_filesystem_group": resourceFilesystemGroup(),
 				"weka_user":             resourceUser(),
+				"weka_s3_policy":        resourceS3Policy(),
 			},
 			DataSourcesMap:       map[string]*schema.Resource{},
 			ConfigureContextFunc: providerConfigure,
