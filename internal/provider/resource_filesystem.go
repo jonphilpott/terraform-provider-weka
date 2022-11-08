@@ -13,10 +13,10 @@ import (
 
 func resourceFilesystem() *schema.Resource {
 	return &schema.Resource{
-		ReadContext:   resourceFileystemRead,
-		CreateContext: resourceFileystemCreate,
-		UpdateContext: resourceFileystemUpdate,
-		DeleteContext: resourceFileystemDelete,
+		ReadContext:   resourceFilesystemRead,
+		CreateContext: resourceFilesystemCreate,
+		UpdateContext: resourceFilesystemUpdate,
+		DeleteContext: resourceFilesystemDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -66,7 +66,7 @@ func resourceFilesystem() *schema.Resource {
 	}
 }
 
-type WekaFileystem struct {
+type WekaFilesystem struct {
 	Data struct {
 		ID                   string `json:"id"`
 		AutoMaxFiles         bool   `json:"auto_max_files"`
@@ -105,8 +105,8 @@ type WekaFileystem struct {
 
 const OurGb = 1000000000
 
-func extractFileystemJsonData(body []byte, d *schema.ResourceData) error {
-	var kms WekaFileystem
+func extractFilesystemJsonData(body []byte, d *schema.ResourceData) error {
+	var kms WekaFilesystem
 
 	if err := json.Unmarshal(body, &kms); err != nil {
 		return err
@@ -139,7 +139,7 @@ func extractFileystemJsonData(body []byte, d *schema.ResourceData) error {
 	return nil
 }
 
-func resourceFileystemRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceFilesystemRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*WekaClient)
 	var diags diag.Diagnostics
 
@@ -157,14 +157,14 @@ func resourceFileystemRead(ctx context.Context, d *schema.ResourceData, m interf
 		return diag.FromErr(err)
 	}
 
-	if err := extractFileystemJsonData(body, d); err != nil {
+	if err := extractFilesystemJsonData(body, d); err != nil {
 		return diag.FromErr(err)
 	}
 
 	return diags
 }
 
-func resourceFileystemDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceFilesystemDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	c := m.(*WekaClient)
 
@@ -185,7 +185,7 @@ func resourceFileystemDelete(ctx context.Context, d *schema.ResourceData, m inte
 	return diags
 }
 
-func resourceFileystemUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceFilesystemUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	c := m.(*WekaClient)
 
@@ -239,14 +239,14 @@ func resourceFileystemUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		return diag.FromErr(err)
 	}
 
-	extractFileystemJsonData(body, d)
+	extractFilesystemJsonData(body, d)
 
 	d.Set("last_updated", time.Now().Format(time.RFC850))
 
 	return diags
 }
 
-func resourceFileystemCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceFilesystemCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	c := m.(*WekaClient)
 
@@ -283,7 +283,7 @@ func resourceFileystemCreate(ctx context.Context, d *schema.ResourceData, m inte
 		return diag.FromErr(err)
 	}
 
-	var kms WekaFileystem
+	var kms WekaFilesystem
 
 	if err := json.Unmarshal(body, &kms); err != nil {
 		return diag.FromErr(err)

@@ -52,7 +52,7 @@ type WekaFileystemGroup struct {
 	} `json:"data"`
 }
 
-func extractFileystemGroupJsonData(body []byte, d *schema.ResourceData) error {
+func extractFilesystemGroupJsonData(body []byte, d *schema.ResourceData) error {
 	var kms WekaFileystemGroup
 
 	if err := json.Unmarshal(body, &kms); err != nil {
@@ -85,7 +85,7 @@ func resourceFileystemGroupRead(ctx context.Context, d *schema.ResourceData, m i
 		return diag.FromErr(err)
 	}
 
-	if err := extractFileystemGroupJsonData(body, d); err != nil {
+	if err := extractFilesystemGroupJsonData(body, d); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -146,7 +146,7 @@ func resourceFileystemGroupUpdate(ctx context.Context, d *schema.ResourceData, m
 		return diag.FromErr(err)
 	}
 
-	extractFileystemJsonData(body, d)
+	extractFilesystemJsonData(body, d)
 
 	d.Set("last_updated", time.Now().Format(time.RFC850))
 

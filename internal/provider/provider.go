@@ -66,6 +66,7 @@ func New(version string) func() *schema.Provider {
 				"weka_filesystem_group": resourceFilesystemGroup(),
 				"weka_user":             resourceUser(),
 				"weka_s3_policy":        resourceS3Policy(),
+				"weka_user_s3_policy":   resourceUserPolicy(),
 			},
 			DataSourcesMap:       map[string]*schema.Resource{},
 			ConfigureContextFunc: providerConfigure,
@@ -94,8 +95,8 @@ type WekaClient struct {
 type WekaErrorResponse struct {
 	Message string `json:"message"`
 	Data    struct {
-		Error     string `json:"error"`
-		Reason    string `json:"reason"`
+		Error  string `json:"error"`
+		Reason string `json:"reason"`
 	} `json:"data"`
 }
 
@@ -154,13 +155,12 @@ func (w *WekaClient) makeRequest(r *http.Request) ([]byte, error) {
 		message = wer.Message
 
 		// response indicates an error
-		if (wer.Data.Error != "" || wer.Data.Reason != "")  {
+		if wer.Data.Error != "" || wer.Data.Reason != "" {
 			return nil, fmt.Errorf("Error from Weka API: %s", wer.Message)
 		}
 	} else {
 		log.Printf("[DEBUG] body did not parse.")
 	}
-
 
 	// check status code
 	if res.StatusCode != http.StatusOK {
@@ -211,7 +211,6 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		}
 
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-
 
 		// form URL.
 		loginUrl := c.makeRestEndpointURL("login")

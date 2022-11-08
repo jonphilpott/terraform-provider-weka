@@ -5,13 +5,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	awspolicy "github.com/hashicorp/awspolicyequivalence"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	awspolicy "github.com/hashicorp/awspolicyequivalence"
 	"net/http"
-	"time"
 	"strings"
+	"time"
 )
 
 func resourceS3Policy() *schema.Resource {
@@ -52,7 +52,7 @@ func AWSPolicyDiff(k, old, new string, d *schema.ResourceData) bool {
 	if err != nil {
 		return false
 	}
-	
+
 	return equivalent
 }
 
@@ -81,7 +81,7 @@ func resourceS3PolicyRead(ctx context.Context, d *schema.ResourceData, m interfa
 	}
 
 	var policy map[string]interface{} = responseDoc["data"].(map[string]interface{})["policy"].(map[string]interface{})
-	
+
 	// remarshall the policy document. urgh.
 	policyDocument, _ := json.Marshal(policy["content"])
 
@@ -148,7 +148,6 @@ func resourceS3PolicyCreate(ctx context.Context, d *schema.ResourceData, m inter
 	}
 
 	_, err = c.makeRequest(req)
-
 
 	// if the swagger docs are to be trusted, then there's no useful
 	// return from creating the policy, makeRequest will handle the
