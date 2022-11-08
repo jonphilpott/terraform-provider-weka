@@ -43,10 +43,12 @@ func resourceUser() *schema.Resource {
 			"posix_uid": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
+				Computed: true,
 			},
 			"posix_gid": &schema.Schema{
-				Type:      schema.TypeInt,
-				Optional:  true,
+				Type:     schema.TypeInt,
+				Optional: true,
+				Computed: true,
 			},
 			"last_updated": &schema.Schema{
 				Type:     schema.TypeInt,
