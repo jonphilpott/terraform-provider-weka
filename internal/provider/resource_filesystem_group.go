@@ -5,10 +5,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"net/http"
 	"time"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceFilesystemGroup() *schema.Resource {
@@ -72,7 +73,7 @@ func resourceFileystemGroupRead(ctx context.Context, d *schema.ResourceData, m i
 	var diags diag.Diagnostics
 
 	id := d.Id()
-	url := c.makeRestEndpointURL(fmt.Sprintf("fileSystemsGroups/%s", id))
+	url := c.makeRestEndpointURL(fmt.Sprintf("fileSystemGroups/%s", id))
 	req, err := http.NewRequest("GET", url.String(), nil)
 
 	if err != nil {
@@ -97,7 +98,7 @@ func resourceFileystemGroupDelete(ctx context.Context, d *schema.ResourceData, m
 	c := m.(*WekaClient)
 
 	id := d.Id()
-	url := c.makeRestEndpointURL(fmt.Sprintf("fileSystemsGroups/%s", id))
+	url := c.makeRestEndpointURL(fmt.Sprintf("fileSystemGroups/%s", id))
 	req, err := http.NewRequest("DELETE", url.String(), nil)
 
 	if err != nil {
@@ -169,7 +170,7 @@ func resourceFileystemGroupCreate(ctx context.Context, d *schema.ResourceData, m
 		return diag.FromErr(err)
 	}
 
-	url := c.makeRestEndpointURL("fileSystemsGroups")
+	url := c.makeRestEndpointURL("fileSystemGroups")
 	req, err := http.NewRequest("POST", url.String(), bytes.NewBuffer(createBody))
 
 	body, err := c.makeRequest(req)
