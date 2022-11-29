@@ -59,6 +59,11 @@ func New(version string) func() *schema.Provider {
 					Required:    true,
 					DefaultFunc: schema.EnvDefaultFunc("WEKA_ENDPOINT", nil),
 				},
+				"client_timeout": &schema.Schema{
+					Type:        schema.TypeInt,
+					Optional:    true,
+					Default:     10,
+				},
 			},
 			ResourcesMap: map[string]*schema.Resource{
 				"weka_kms":              resourceKMS(),
@@ -179,6 +184,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	password := d.Get("password").(string)
 	org := d.Get("org").(string)
 	endpoint := d.Get("endpoint").(string)
+	timeout := d.Get("client_timeout").(int)
 
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
@@ -207,7 +213,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		}
 
 		c.client = &http.Client{
-			Timeout: time.Second * 10,
+			Timeout: time.Second * time.Duration(timeout),
 		}
 
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
