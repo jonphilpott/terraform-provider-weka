@@ -213,7 +213,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		}
 
 		c.client = &http.Client{
-			Timeout: time.Second * timeout,
+			Timeout: time.Second * time.Duration(timeout),
 		}
 
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
