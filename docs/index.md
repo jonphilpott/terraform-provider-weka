@@ -21,3 +21,7 @@ description: |-
 - `org` (String)
 - `password` (String, Sensitive)
 - `username` (String)
+
+### Optional
+
+- `client_timeout` (Number)
