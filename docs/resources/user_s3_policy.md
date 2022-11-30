@@ -3,12 +3,12 @@
 page_title: "weka_user_s3_policy Resource - terraform-provider-weka"
 subcategory: ""
 description: |-
-  
+  Resource manages mapping an s3 policy name to a user.
 ---
 
 # weka_user_s3_policy (Resource)
 
-
+Resource manages mapping an s3 policy name to a user.
 
 
 

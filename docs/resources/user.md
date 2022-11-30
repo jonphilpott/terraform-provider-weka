@@ -3,12 +3,12 @@
 page_title: "weka_user Resource - terraform-provider-weka"
 subcategory: ""
 description: |-
-  
+  Manages users in Weka. Please note that the Weka API does not provide the ability to pull the information about a single user with all the required fields, because of this it is not possible to import a user resource or detect remote changes at this time.
 ---
 
 # weka_user (Resource)
 
-
+Manages users in Weka. Please note that the Weka API does not provide the ability to pull the information about a single user with all the required fields, because of this it is not possible to import a user resource or detect remote changes at this time.
 
 
 
@@ -18,7 +18,7 @@ description: |-
 ### Required
 
 - `password` (String, Sensitive)
-- `role` (String)
+- `role` (String) Must be one of: ClusterAdmin, OrgAdmin, ReadOnly, Regular or S3
 - `username` (String)
 
 ### Optional

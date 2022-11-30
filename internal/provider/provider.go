@@ -39,27 +39,32 @@ func New(version string) func() *schema.Provider {
 		p := &schema.Provider{
 			Schema: map[string]*schema.Schema{
 				"username": &schema.Schema{
+					Description: "Weka Username to use to log into Weka. Can be set via environment variable WEKA_USERNAME",
 					Type:        schema.TypeString,
 					Required:    true,
 					DefaultFunc: schema.EnvDefaultFunc("WEKA_USERNAME", nil),
 				},
 				"password": &schema.Schema{
+					Description: "Weka Password to use to log into Weka. Can be set via environment variable WEKA_PASSWORD",
 					Type:        schema.TypeString,
 					Required:    true,
 					Sensitive:   true,
 					DefaultFunc: schema.EnvDefaultFunc("WEKA_PASSWORD", nil),
 				},
 				"org": &schema.Schema{
+					Description: "Org the user belongs to in Weka, usually 'root'. Can be set via environment variable WEKA_ORG",
 					Type:        schema.TypeString,
 					Required:    true,
 					DefaultFunc: schema.EnvDefaultFunc("WEKA_ORG", nil),
 				},
 				"endpoint": &schema.Schema{
+					Description: "URL to weka endpoint, should be the base url with the api root path, e.g http://weka/api/v2. Can be set via WEKA_ENDPOINT",
 					Type:        schema.TypeString,
 					Required:    true,
 					DefaultFunc: schema.EnvDefaultFunc("WEKA_ENDPOINT", nil),
 				},
 				"client_timeout": &schema.Schema{
+					Description: "HTTP Timeout in seconds when communicating with Weka API.",
 					Type:        schema.TypeInt,
 					Optional:    true,
 					Default:     10,

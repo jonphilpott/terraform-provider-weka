@@ -13,6 +13,7 @@ import (
 
 func resourceFilesystem() *schema.Resource {
 	return &schema.Resource{
+		Description:   "Manages filesystems within Weka. Caveats: creating and manging a tiered file system with mulitple OBS buckets is currently not supported. A filesystems cannot be switched between tiered and non-tiered. OBS names cannot be changed. Gigabytes are defined as 1000000000 bytes",
 		ReadContext:   resourceFilesystemRead,
 		CreateContext: resourceFilesystemCreate,
 		UpdateContext: resourceFilesystemUpdate,
@@ -30,16 +31,18 @@ func resourceFilesystem() *schema.Resource {
 				Required: true,
 			},
 			"total_capacity_gb": &schema.Schema{
-				Type:     schema.TypeInt,
-				Required: true,
+				Description: "total capacity in gigabytes, defined as 1000000000 bytes",
+				Type:        schema.TypeInt,
+				Required:    true,
 			},
 			"obs_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 			"ssd_capacity_gb": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
+				Description: "SSD capacity in gigabytes, defined as 1000000000 bytes",
+				Type:        schema.TypeInt,
+				Optional:    true,
 			},
 			"encrypted": &schema.Schema{
 				Type:     schema.TypeBool,

@@ -13,6 +13,7 @@ import (
 
 func resourceUserPolicy() *schema.Resource {
 	return &schema.Resource{
+		Description:   "Resource manages mapping an s3 policy name to a user.",
 		ReadContext:   resourceUserPolicyRead,
 		CreateContext: resourceUserPolicyCreate,
 		UpdateContext: resourceUserPolicyUpdate,

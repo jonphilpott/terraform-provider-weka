@@ -3,12 +3,12 @@
 page_title: "weka_filesystem Resource - terraform-provider-weka"
 subcategory: ""
 description: |-
-  
+  Manages filesystems within Weka. Caveats: creating and manging a tiered file system with mulitple OBS buckets is currently not supported. A filesystems cannot be switched between tiered and non-tiered. OBS names cannot be changed. Gigabytes are defined as 1000000000 bytes
 ---
 
 # weka_filesystem (Resource)
 
-
+Manages filesystems within Weka. Caveats: creating and manging a tiered file system with mulitple OBS buckets is currently not supported. A filesystems cannot be switched between tiered and non-tiered. OBS names cannot be changed. Gigabytes are defined as 1000000000 bytes
 
 
 
@@ -20,7 +20,7 @@ description: |-
 - `group_name` (String)
 - `name` (String)
 - `tiered` (Boolean)
-- `total_capacity_gb` (Number)
+- `total_capacity_gb` (Number) total capacity in gigabytes, defined as 1000000000 bytes
 
 ### Optional
 
@@ -29,7 +29,7 @@ description: |-
 - `encrypted` (Boolean)
 - `last_updated` (String)
 - `obs_name` (String)
-- `ssd_capacity_gb` (Number)
+- `ssd_capacity_gb` (Number) SSD capacity in gigabytes, defined as 1000000000 bytes
 
 ### Read-Only
 

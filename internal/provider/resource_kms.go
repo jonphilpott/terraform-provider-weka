@@ -14,6 +14,7 @@ import (
 
 func resourceKMS() *schema.Resource {
 	return &schema.Resource{
+		Description:   "Manage KMS resource within Weka. Note: Weka API does not provide a read API for KMS configuration, as such a KMS configuration cannot be imported nor will remote changes be detected.",
 		ReadContext:   resourceKMSRead,
 		CreateContext: resourceKMSCreate,
 		UpdateContext: resourceKMSUpdate,

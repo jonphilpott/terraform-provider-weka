@@ -17,7 +17,7 @@ description: |-
 
 ### Required
 
-- `policy_file_content` (String)
+- `policy_file_content` (String) JSON string containing S3 policy document.
 - `policy_name` (String)
 
 ### Optional

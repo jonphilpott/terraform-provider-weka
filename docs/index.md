@@ -17,11 +17,11 @@ description: |-
 
 ### Required
 
-- `endpoint` (String)
-- `org` (String)
-- `password` (String, Sensitive)
-- `username` (String)
+- `endpoint` (String) URL to weka endpoint, should be the base url with the api root path, e.g http://weka/api/v2. Can be set via WEKA_ENDPOINT
+- `org` (String) Org the user belongs to in Weka, usually 'root'. Can be set via environment variable WEKA_ORG
+- `password` (String, Sensitive) Weka Password to use to log into Weka. Can be set via environment variable WEKA_PASSWORD
+- `username` (String) Weka Username to use to log into Weka. Can be set via environment variable WEKA_USERNAME
 
 ### Optional
 
-- `client_timeout` (Number)
+- `client_timeout` (Number) HTTP Timeout in seconds when communicating with Weka API.
