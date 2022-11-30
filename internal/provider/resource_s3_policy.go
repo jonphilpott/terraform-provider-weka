@@ -26,6 +26,7 @@ func resourceS3Policy() *schema.Resource {
 				Required: true,
 			},
 			"policy_file_content": &schema.Schema{
+				Description:      "JSON string containing S3 policy document.",
 				Type:             schema.TypeString,
 				Required:         true,
 				ValidateFunc:     validation.StringIsJSON,

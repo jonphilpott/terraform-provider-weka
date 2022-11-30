@@ -13,6 +13,7 @@ import (
 
 func resourceUser() *schema.Resource {
 	return &schema.Resource{
+		Description:   "Manages users in Weka. Please note that the Weka API does not provide the ability to pull the information about a single user with all the required fields, because of this it is not possible to import a user resource or detect remote changes at this time.",
 		ReadContext:   resourceUserRead,
 		CreateContext: resourceUserCreate,
 		UpdateContext: resourceUserUpdate,
@@ -28,8 +29,9 @@ func resourceUser() *schema.Resource {
 				Sensitive: true,
 			},
 			"role": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "Must be one of: ClusterAdmin, OrgAdmin, ReadOnly, Regular or S3",
+				Type:        schema.TypeString,
+				Required:    true,
 				ValidateFunc: func(val any, key string) (warns []string, errs []error) {
 					v := val.(string)
 
