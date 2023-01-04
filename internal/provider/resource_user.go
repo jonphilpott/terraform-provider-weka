@@ -78,7 +78,8 @@ type WekaUser struct {
 // users to match against a single user resource? and even in that case the only
 // updatable field would be role (i.e the intersection between fields in get/update)
 func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	return nil
+	var diags diag.Diagnostics
+	return diags
 }
 
 func resourceUserDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

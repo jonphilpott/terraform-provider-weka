@@ -87,7 +87,8 @@ type WekaKMS struct {
 
 // Do Nothing. Not enough information is returned in the read to make any determination.
 func resourceKMSRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	return nil
+	var diags diag.Diagnostics
+	return diags	
 }
 
 func resourceKMSDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
