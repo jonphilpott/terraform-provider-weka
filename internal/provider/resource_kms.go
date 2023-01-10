@@ -20,53 +20,53 @@ func resourceKMS() *schema.Resource {
 		UpdateContext: resourceKMSUpdate,
 		DeleteContext: resourceKMSDelete,
 		Schema: map[string]*schema.Schema{
-			"base_url": &schema.Schema{
+			"base_url": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"master_key_name": &schema.Schema{
+			"master_key_name": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"token": &schema.Schema{
+			"token": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("WEKA_VAULT_TOKEN", nil),
 				Sensitive:   true,
 			},
-			"server_endpoint": &schema.Schema{
+			"server_endpoint": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"key_uid": &schema.Schema{
+			"key_uid": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("WEKA_VAULT_KEY_UID", nil),
 				Sensitive:   true,
 			},
-			"client_cert_pem": &schema.Schema{
+			"client_cert_pem": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("WEKA_VAULT_CLIENT_CERT", nil),
 				Sensitive:   true,
 			},
-			"client_key_pem": &schema.Schema{
+			"client_key_pem": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("WEKA_VAULT_CLIENT_KEY", nil),
 				Sensitive:   true,
 			},
-			"ca_cert_pem": &schema.Schema{
+			"ca_cert_pem": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("WEKA_VAULT_CA_CERT", nil),
 				Sensitive:   true,
 			},
-			"use_vault": &schema.Schema{
+			"use_vault": {
 				Type:     schema.TypeBool,
 				Required: true,
 			},
-			"last_updated": &schema.Schema{
+			"last_updated": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -88,7 +88,7 @@ type WekaKMS struct {
 // Do Nothing. Not enough information is returned in the read to make any determination.
 func resourceKMSRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	return diags	
+	return diags
 }
 
 func resourceKMSDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

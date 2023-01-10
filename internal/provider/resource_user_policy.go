@@ -19,15 +19,15 @@ func resourceUserPolicy() *schema.Resource {
 		UpdateContext: resourceUserPolicyUpdate,
 		DeleteContext: resourceUserPolicyDelete,
 		Schema: map[string]*schema.Schema{
-			"username": &schema.Schema{
+			"username": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"s3_policy_name": &schema.Schema{
+			"s3_policy_name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"last_updated": &schema.Schema{
+			"last_updated": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,

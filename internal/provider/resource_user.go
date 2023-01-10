@@ -19,16 +19,16 @@ func resourceUser() *schema.Resource {
 		UpdateContext: resourceUserUpdate,
 		DeleteContext: resourceUserDelete,
 		Schema: map[string]*schema.Schema{
-			"username": &schema.Schema{
+			"username": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"password": &schema.Schema{
+			"password": {
 				Type:      schema.TypeString,
 				Required:  true,
 				Sensitive: true,
 			},
-			"role": &schema.Schema{
+			"role": {
 				Description: "Must be one of: ClusterAdmin, OrgAdmin, ReadOnly, Regular or S3",
 				Type:        schema.TypeString,
 				Required:    true,
@@ -42,17 +42,17 @@ func resourceUser() *schema.Resource {
 					return
 				},
 			},
-			"posix_uid": &schema.Schema{
+			"posix_uid": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
-			"posix_gid": &schema.Schema{
+			"posix_gid": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
-			"last_updated": &schema.Schema{
+			"last_updated": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,

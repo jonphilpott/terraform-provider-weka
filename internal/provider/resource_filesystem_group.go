@@ -22,19 +22,19 @@ func resourceFilesystemGroup() *schema.Resource {
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"target_ssd_retention": &schema.Schema{
+			"target_ssd_retention": {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"start_demote": &schema.Schema{
+			"start_demote": {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"last_updated": &schema.Schema{
+			"last_updated": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
