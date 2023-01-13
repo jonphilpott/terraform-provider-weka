@@ -81,7 +81,7 @@ func resourceS3Bucket() *schema.Resource {
 				ForceNew:    true,
 			},
 			"last_updated": {
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
