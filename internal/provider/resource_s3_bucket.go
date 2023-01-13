@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"net/http"
 	"time"
+	"regexp"
 )
 
 func resourceS3Bucket() *schema.Resource {
@@ -24,8 +25,29 @@ func resourceS3Bucket() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
-			},
+				ValidateFunc: func(val any, key string) (warns []string, errs []error) {
+					v := val.(string)
 
+					// Bucket names must be between 3 & 63 characters
+					// long
+					l := len(v)
+					if l < 3 || l > 63 {
+						errs = append(errs, fmt.Errorf("Bucket names must be between 3 & 63 characters long."))
+						return
+					}
+
+					// Bucket names can only be lowercase letters,
+					// numbers, dots and hyphens, and cant start or
+					// end with a dot or hyphen.
+					r, _ := regexp.Compile("^[a-z0-9][a-z0-9.-]+[a-z0-9]$")
+					if !r.MatchString(v) {
+						errs = append(errs, fmt.Errorf("Bucket names can only be a-z, 0-9, with dots or hyphens and can only start and end with a letter or number"))
+						return
+					}
+
+					return
+				},
+			},
 			"anonymous_policy_name": {
 				Description: "Name of policy to apply for anonymous access. Must be one of: none, download, upload or public.",
 				Type:        schema.TypeString,
@@ -42,9 +64,9 @@ func resourceS3Bucket() *schema.Resource {
 				Default: "none",
 			},
 			"hard_quota": {
-				Description: "Storage quota, for example '1MB'",
+				Description: "Storage quota, for example '1MB', cannot be used when existing_path is set",
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 			},
 			"existing_path": {
 				Description: "The Weka API does not provide a mechanism to update the existing path, updating this value will delete the bucket and create a new one.",
@@ -134,7 +156,7 @@ func resourceS3BucketUpdate(ctx context.Context, d *schema.ResourceData, m inter
 	var diags diag.Diagnostics
 	id := d.Id()
 	c := m.(*WekaClient)
-
+	
 	// enable partial state since we could be making several API calls for these changes
 	d.Partial(true)
 
@@ -187,7 +209,7 @@ func resourceS3BucketUpdate(ctx context.Context, d *schema.ResourceData, m inter
 
 	return diags
 }
-
+h
 func resourceS3BucketCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	c := m.(*WekaClient)
