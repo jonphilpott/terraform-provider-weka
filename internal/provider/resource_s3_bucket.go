@@ -29,7 +29,7 @@ func resourceS3Bucket() *schema.Resource {
 			"anonymous_policy_name": {
 				Description: "Name of policy to apply for anonymous access. Must be one of: none, download, upload or public.",
 				Type:        schema.TypeString,
-				Required:    false,
+				Optional:    true,
 				ValidateFunc: func(val any, key string) (warns []string, errs []error) {
 					v := val.(string)
 
