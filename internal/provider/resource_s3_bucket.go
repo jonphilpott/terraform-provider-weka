@@ -26,10 +26,20 @@ func resourceS3Bucket() *schema.Resource {
 				ForceNew:    true,
 			},
 
-			"policy_name": {
-				Description: "Previously created S3 policy name.",
+			"anonymous_policy_name": {
+				Description: "Name of policy to apply for anonymous access. Must be one of: none, download, upload or public.",
 				Type:        schema.TypeString,
-				Required:    true,
+				Required:    false,
+				ValidateFunc: func(val any, key string) (warns []string, errs []error) {
+					v := val.(string)
+
+					if !(v == "none" || v == "download" || v == "upload" || v == "public") {
+						errs = append(errs, fmt.Errorf("%q must be one of Must be one of: none, download, upload or public - got: %s", key, v))
+					}
+
+					return
+				},
+				Default: "none",
 			},
 			"hard_quota": {
 				Description: "Storage quota, for example '1MB'",
@@ -150,11 +160,11 @@ func resourceS3BucketUpdate(ctx context.Context, d *schema.ResourceData, m inter
 	}
 
 	// policy change
-	if d.HasChange("policy") {
+	if d.HasChange("anonymous_policy_name") {
 		// tell me - why is it `policy` in the create call and
 		// `bucket_policy` in the update?
 		updateData := map[string]interface{}{
-			"bucket_policy": d.Get("policy_name").(string),
+			"bucket_policy": d.Get("anonymous_policy_name").(string),
 		}
 
 		updateBody, err := json.Marshal(updateData)
@@ -184,7 +194,7 @@ func resourceS3BucketCreate(ctx context.Context, d *schema.ResourceData, m inter
 
 	createParams := make(map[string]interface{})
 
-	createParams["policy"] = d.Get("policy_name").(string)
+	createParams["policy"] = d.Get("anonymous_policy_name").(string)
 	createParams["bucket_name"] = d.Get("bucket_name").(string)
 	createParams["hard_quota"] = d.Get("hard_quota").(string)
 	createParams["fs_uid"] = d.Get("fs_uid").(string)
@@ -206,8 +216,8 @@ func resourceS3BucketCreate(ctx context.Context, d *schema.ResourceData, m inter
 	_, err = c.makeRequest(req)
 
 	// if the swagger docs are to be trusted, then there's no useful
-	// return from creating the policy, makeRequest will handle the
-	// common error scenarios
+	// return data from creating the bucket, makeRequest will handle
+	// the common error scenarios
 	if err != nil {
 		return diag.FromErr(err)
 	}
