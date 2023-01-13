@@ -21,18 +21,18 @@ func resourceS3Policy() *schema.Resource {
 		UpdateContext: resourceS3PolicyUpdate,
 		DeleteContext: resourceS3PolicyDelete,
 		Schema: map[string]*schema.Schema{
-			"policy_name": &schema.Schema{
+			"policy_name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"policy_file_content": &schema.Schema{
+			"policy_file_content": {
 				Description:      "JSON string containing S3 policy document.",
 				Type:             schema.TypeString,
 				Required:         true,
 				ValidateFunc:     validation.StringIsJSON,
 				DiffSuppressFunc: AWSPolicyDiff,
 			},
-			"last_updated": &schema.Schema{
+			"last_updated": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,

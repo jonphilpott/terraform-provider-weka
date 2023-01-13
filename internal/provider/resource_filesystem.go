@@ -22,45 +22,45 @@ func resourceFilesystem() *schema.Resource {
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"group_name": &schema.Schema{
+			"group_name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"total_capacity_gb": &schema.Schema{
+			"total_capacity_gb": {
 				Description: "total capacity in gigabytes, defined as 1000000000 bytes",
 				Type:        schema.TypeInt,
 				Required:    true,
 			},
-			"obs_name": &schema.Schema{
+			"obs_name": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"ssd_capacity_gb": &schema.Schema{
+			"ssd_capacity_gb": {
 				Description: "SSD capacity in gigabytes, defined as 1000000000 bytes",
 				Type:        schema.TypeInt,
 				Optional:    true,
 			},
-			"encrypted": &schema.Schema{
+			"encrypted": {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
-			"auth_required": &schema.Schema{
+			"auth_required": {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
-			"allow_no_kms": &schema.Schema{
+			"allow_no_kms": {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
-			"tiered": &schema.Schema{
+			"tiered": {
 				Type:     schema.TypeBool,
 				Required: true,
 			},
-			"last_updated": &schema.Schema{
+			"last_updated": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,

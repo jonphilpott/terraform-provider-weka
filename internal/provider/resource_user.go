@@ -19,16 +19,16 @@ func resourceUser() *schema.Resource {
 		UpdateContext: resourceUserUpdate,
 		DeleteContext: resourceUserDelete,
 		Schema: map[string]*schema.Schema{
-			"username": &schema.Schema{
+			"username": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"password": &schema.Schema{
+			"password": {
 				Type:      schema.TypeString,
 				Required:  true,
 				Sensitive: true,
 			},
-			"role": &schema.Schema{
+			"role": {
 				Description: "Must be one of: ClusterAdmin, OrgAdmin, ReadOnly, Regular or S3",
 				Type:        schema.TypeString,
 				Required:    true,
@@ -42,17 +42,17 @@ func resourceUser() *schema.Resource {
 					return
 				},
 			},
-			"posix_uid": &schema.Schema{
+			"posix_uid": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
-			"posix_gid": &schema.Schema{
+			"posix_gid": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
-			"last_updated": &schema.Schema{
+			"last_updated": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
@@ -78,7 +78,8 @@ type WekaUser struct {
 // users to match against a single user resource? and even in that case the only
 // updatable field would be role (i.e the intersection between fields in get/update)
 func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	return nil
+	var diags diag.Diagnostics
+	return diags
 }
 
 func resourceUserDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
