@@ -89,6 +89,19 @@ func resourceS3Bucket() *schema.Resource {
 	}
 }
 
+
+type WekaS3Bucket struct {
+	Data struct {
+		Buckets []struct {
+			Name             string `json:"name"`
+			HardLimitBytes   int    `json:"hard_limit_bytes"`
+			Path             string `json:"path"`
+			UsedBytes        int    `json:"used_bytes"`
+			FileSystem       string `json:"fs"`
+		} `json:"buckets"`
+	} `json:"data"`
+}
+
 func resourceS3BucketRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*WekaClient)
 	var diags diag.Diagnostics
@@ -107,18 +120,17 @@ func resourceS3BucketRead(ctx context.Context, d *schema.ResourceData, m interfa
 		return diag.FromErr(err)
 	}
 
-	var parsed map[string]interface{}
+	var parsed WekaS3Bucket
 
 	if err := json.Unmarshal(body, &parsed); err != nil {
 		return diag.FromErr(err)
 	}
 
-	buckets := parsed["buckets"].([]interface{})
-	for i := 0; i < len(buckets); i++ {
-		s := buckets[i].(string)
+	for i := 0; i < len(parsed.Data.Buckets); i++ {
+		b := parsed.Data.Buckets[i]
 
 		// if the bucket exists, no change.
-		if s == id {
+		if b.Name == id {
 			return diags
 		}
 	}
@@ -209,7 +221,7 @@ func resourceS3BucketUpdate(ctx context.Context, d *schema.ResourceData, m inter
 
 	return diags
 }
-h
+
 func resourceS3BucketCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	c := m.(*WekaClient)
