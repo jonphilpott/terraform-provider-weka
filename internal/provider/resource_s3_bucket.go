@@ -146,7 +146,7 @@ func resourceS3BucketDelete(ctx context.Context, d *schema.ResourceData, m inter
 	c := m.(*WekaClient)
 
 	id := d.Id()
-	url := c.makeRestEndpointURL(fmt.Sprintf("/s3/bucket/%s", id))
+	url := c.makeRestEndpointURL(fmt.Sprintf("/s3/buckets/%s", id))
 	req, err := http.NewRequest("DELETE", url.String(), nil)
 
 	if err != nil {
