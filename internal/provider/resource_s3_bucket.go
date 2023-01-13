@@ -229,10 +229,18 @@ func resourceS3BucketCreate(ctx context.Context, d *schema.ResourceData, m inter
 	createParams := make(map[string]interface{})
 
 	createParams["policy"] = d.Get("anonymous_policy_name").(string)
+
 	createParams["bucket_name"] = d.Get("bucket_name").(string)
-	createParams["hard_quota"] = d.Get("hard_quota").(string)
+
+	if d.HasChange("hard_quota") { 
+		createParams["hard_quota"] = d.Get("hard_quota").(string)
+	}
+	
 	createParams["fs_uid"] = d.Get("fs_uid").(string)
-	createParams["existing_path"] = d.Get("existing_path").(string)
+
+	if d.HasChange("existing_path") {
+		createParams["existing_path"] = d.Get("existing_path").(string)
+	}
 
 	createBody, err := json.Marshal(createParams)
 
