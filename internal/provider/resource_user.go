@@ -111,7 +111,6 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 	for i := 0; i < len(parsed.Data); i++ {
 		b := parsed.Data[i]
 
-		
 		if b.UID == id {
 			// role is the only field returned in the response that we
 			// can actually edit.

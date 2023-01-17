@@ -8,8 +8,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"net/http"
-	"time"
 	"regexp"
+	"time"
 )
 
 func resourceS3Bucket() *schema.Resource {
@@ -89,15 +89,14 @@ func resourceS3Bucket() *schema.Resource {
 	}
 }
 
-
 type WekaS3Bucket struct {
 	Data struct {
 		Buckets []struct {
-			Name             string `json:"name"`
-			HardLimitBytes   int    `json:"hard_limit_bytes"`
-			Path             string `json:"path"`
-			UsedBytes        int    `json:"used_bytes"`
-			FileSystem       string `json:"fs"`
+			Name           string `json:"name"`
+			HardLimitBytes int    `json:"hard_limit_bytes"`
+			Path           string `json:"path"`
+			UsedBytes      int    `json:"used_bytes"`
+			FileSystem     string `json:"fs"`
 		} `json:"buckets"`
 	} `json:"data"`
 }
@@ -168,7 +167,7 @@ func resourceS3BucketUpdate(ctx context.Context, d *schema.ResourceData, m inter
 	var diags diag.Diagnostics
 	id := d.Id()
 	c := m.(*WekaClient)
-	
+
 	// enable partial state since we could be making several API calls for these changes
 	d.Partial(true)
 
@@ -232,10 +231,10 @@ func resourceS3BucketCreate(ctx context.Context, d *schema.ResourceData, m inter
 
 	createParams["bucket_name"] = d.Get("bucket_name").(string)
 
-	if d.HasChange("hard_quota") { 
+	if d.HasChange("hard_quota") {
 		createParams["hard_quota"] = d.Get("hard_quota").(string)
 	}
-	
+
 	createParams["fs_uid"] = d.Get("fs_uid").(string)
 
 	if d.HasChange("existing_path") {

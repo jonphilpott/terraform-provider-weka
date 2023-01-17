@@ -36,13 +36,11 @@ func resourceUserPolicy() *schema.Resource {
 	}
 }
 
-
 type WekaUserPolicies struct {
 	Data struct {
 		Users map[string]string `json:"users"`
 	} `json:"data"`
 }
-
 
 // GET /s3/userPolicies will tell us if the policy is mapped or not.
 func resourceUserPolicyRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -68,8 +66,8 @@ func resourceUserPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 	}
 
 	current_policy = d.Get("s3_policy_name").(string)
-	
-	if policy, exists := parsed.Data.Users["username"] ; exists {
+
+	if policy, exists := parsed.Data.Users["username"]; exists {
 		// lgtm
 		if current_policy == policy {
 			return diags
@@ -80,10 +78,10 @@ func resourceUserPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 		// terraform deal with the difference
 		d.Set("s3_policy_name", policy)
 	}
-	
+
 	// no policy attached to this user, or user does not exist.
 	d.SetId("")
-	return diags	
+	return diags
 }
 
 func resourceUserPolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
