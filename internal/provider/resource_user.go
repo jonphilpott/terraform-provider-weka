@@ -13,7 +13,7 @@ import (
 
 func resourceUser() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Manages users in Weka. Please note that the Weka API does not provide the ability to pull the information about a single user with all the required fields, because of this it is not possible to import a user resource or detect remote changes at this time.",
+		Description:   "Manages users in Weka. Module will detect if a user or a user's role changes remotely, but other changes will not be detected.",
 		ReadContext:   resourceUserRead,
 		CreateContext: resourceUserCreate,
 		UpdateContext: resourceUserUpdate,
@@ -87,7 +87,8 @@ type WekaGetUsers struct {
 // _all_ of them
 func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-
+	c := m.(*WekaClient)
+	
 	id := d.Id()
 	url := c.makeRestEndpointURL("/users")
 	req, err := http.NewRequest("GET", url.String(), nil)

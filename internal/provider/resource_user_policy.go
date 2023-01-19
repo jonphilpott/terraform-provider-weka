@@ -45,6 +45,7 @@ type WekaUserPolicies struct {
 // GET /s3/userPolicies will tell us if the policy is mapped or not.
 func resourceUserPolicyRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+	c := m.(*WekaClient)
 
 	url := c.makeRestEndpointURL("/s3/userPolicies")
 	req, err := http.NewRequest("GET", url.String(), nil)
@@ -65,7 +66,7 @@ func resourceUserPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 		return diag.FromErr(err)
 	}
 
-	current_policy = d.Get("s3_policy_name").(string)
+	current_policy := d.Get("s3_policy_name").(string)
 
 	if policy, exists := parsed.Data.Users["username"]; exists {
 		// lgtm
