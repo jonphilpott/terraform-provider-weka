@@ -13,7 +13,7 @@ import (
 
 func resourceUser() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Manages users in Weka. Please note that the Weka API does not provide the ability to pull the information about a single user with all the required fields, because of this it is not possible to import a user resource or detect remote changes at this time.",
+		Description:   "Manages users in Weka. Module will detect if a user or a user's role changes remotely, but other changes will not be detected.",
 		ReadContext:   resourceUserRead,
 		CreateContext: resourceUserCreate,
 		UpdateContext: resourceUserUpdate,
@@ -73,12 +73,56 @@ type WekaUser struct {
 	} `json:"data"`
 }
 
-// TODO: Weka API doesn't have an endpoint to get an individual user,
-// we can get _all_ users via GET /users, is it worth pulling all
-// users to match against a single user resource? and even in that case the only
-// updatable field would be role (i.e the intersection between fields in get/update)
+type WekaGetUsers struct {
+	Data []struct {
+		UID      string `json:"uid"`
+		OrgID    int    `json:"org_id"`
+		Source   string `json:"source"`
+		Username string `json:"username"`
+		Role     string `json:"role"`
+	} `json:"data"`
+}
+
+// weka doesn't provide an API to get a single user, so we have to get
+// _all_ of them
 func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+	c := m.(*WekaClient)
+	
+	id := d.Id()
+	url := c.makeRestEndpointURL("/users")
+	req, err := http.NewRequest("GET", url.String(), nil)
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	body, err := c.makeRequest(req)
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	var parsed WekaGetUsers
+
+	if err := json.Unmarshal(body, &parsed); err != nil {
+		return diag.FromErr(err)
+	}
+
+	for i := 0; i < len(parsed.Data); i++ {
+		b := parsed.Data[i]
+
+		if b.UID == id {
+			// role is the only field returned in the response that we
+			// can actually edit.
+			d.Set("role", b.Role)
+			return diags
+		}
+	}
+
+	// the user wasn't found in the list, so tell terraform that it
+	// needs to be recreated.
+	d.SetId("")
 	return diags
 }
 

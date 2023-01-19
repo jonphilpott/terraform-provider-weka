@@ -36,8 +36,53 @@ func resourceUserPolicy() *schema.Resource {
 	}
 }
 
+type WekaUserPolicies struct {
+	Data struct {
+		Users map[string]string `json:"users"`
+	} `json:"data"`
+}
+
+// GET /s3/userPolicies will tell us if the policy is mapped or not.
 func resourceUserPolicyRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	return nil
+	var diags diag.Diagnostics
+	c := m.(*WekaClient)
+
+	url := c.makeRestEndpointURL("/s3/userPolicies")
+	req, err := http.NewRequest("GET", url.String(), nil)
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	body, err := c.makeRequest(req)
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	var parsed WekaUserPolicies
+
+	if err := json.Unmarshal(body, &parsed); err != nil {
+		return diag.FromErr(err)
+	}
+
+	current_policy := d.Get("s3_policy_name").(string)
+
+	if policy, exists := parsed.Data.Users["username"]; exists {
+		// lgtm
+		if current_policy == policy {
+			return diags
+		}
+
+		// policy could be set to something other than we have
+		// defined, or it could be empty "", in which case let
+		// terraform deal with the difference
+		d.Set("s3_policy_name", policy)
+	}
+
+	// no policy attached to this user, or user does not exist.
+	d.SetId("")
+	return diags
 }
 
 func resourceUserPolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -73,6 +118,7 @@ func resourceUserPolicyDelete(ctx context.Context, d *schema.ResourceData, m int
 func resourceUserPolicyUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
+	d.Partial(true)
 	// if the username changed, we have to detach the policy from the
 	// user and _attach_ to the new user (i.e call Delete and Create)
 	if d.HasChange("username") {
@@ -91,6 +137,7 @@ func resourceUserPolicyUpdate(ctx context.Context, d *schema.ResourceData, m int
 		return diags
 	}
 
+	d.Partial(false)
 	d.Set("last_updated", time.Now().Format(time.RFC850))
 	return diags
 }
